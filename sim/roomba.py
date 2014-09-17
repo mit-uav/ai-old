@@ -1,0 +1,2 @@
+class Roomba:
+	pass
