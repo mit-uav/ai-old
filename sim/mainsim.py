@@ -1,5 +1,10 @@
 from quadcopter import Quadcopter
 from roomba import Roomba
+import random
+
+roomba_list = initRoombas(20)
+obstacle_list = initObstacles(4)
+quadcopter = Quadcopter()
 
 import pygame, sys
 from pygame.locals import *
@@ -17,15 +22,43 @@ COLOR_QUAD = COLOR_BLACK
 COLOR_OBS = COLOR_RED
 COLOR_SHEEP = COLOR_BLUE
 
+WIN_WIDTH = 640
+WIN_HEIGHT = 480
 windowSurfaceObj = pygame.display.set_mode((640, 480))
 pygame.display.set_caption("IARC UAV Simulator")
 
-# TODO: Store roomba circles and obstacles
-
 # main loop
 while True:
-	windowSurfaceObj.fill(COLOR_BG)
+    windowSurfaceObj.fill(COLOR_BG)
 
-	# TODO: Render roomba circles and obstacles
+    #step through all objects
+    quadcopter.updatePosition()
+    for roomba in roomba_list:
+        roomba.updatePosition()
+    for obs in obstacle_list:
+        obs.updatePosition()
 
-	fpsClock.tick(45)
+    #render objects as circles and crosses onscreen
+
+    fpsClock.tick(45)
+
+# The following two functions are separate in case of future decisions 
+# to distinguish the roombas and obstacles more.
+def initRoombas(num = 20):
+    return [Roomba(x = random.randrange(WIN_WIDTH),
+                   y = random.randrange(WIN_HEIGHT))
+                   for i in range(num)]
+
+def initObstacles(num = 4):
+    return [Roomba(x = random.randrange(WIN_WIDTH),
+                   y = random.randrange(WIN_HEIGHT))
+                   for i in range(num)]
+
+def drawRoomba(roomba):
+    pass
+
+def drawObstacle(obs):
+    pass
+
+def drawQuadcopter(quad):
+    pass
