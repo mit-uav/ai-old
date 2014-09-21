@@ -32,11 +32,11 @@ while True:
     windowSurfaceObj.fill(COLOR_BG)
 
     #step through all objects
-    quadcopter.step()
+    quadcopter.updatePosition()
     for roomba in roomba_list:
-        roomba.step()
+        roomba.updatePosition()
     for obs in obstacle_list:
-        obs.step()
+        obs.updatePosition()
 
     #render objects as circles and crosses onscreen
 
@@ -53,3 +53,12 @@ def initObstacles(num = 4):
     return [Roomba(x = random.randrange(WIN_WIDTH),
                    y = random.randrange(WIN_HEIGHT))
                    for i in range(num)]
+
+def drawRoomba(roomba):
+    pass
+
+def drawObstacle(obs):
+    pass
+
+def drawQuadcopter(quad):
+    pass
