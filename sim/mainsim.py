@@ -1,31 +1,23 @@
-from quadcopter import Quadcopter
-from roomba import Roomba
+# you need pygame to run this file
+# sudo apt-get install python-pygame
 
-import pygame, sys
-from pygame.locals import *
+from gui_lib import *
 
-pygame.init()
-fpsClock = pygame.time.Clock()
-
-COLOR_BLACK = pygame.Color(0,0,0)
-COLOR_BLUE = pygame.Color(0,0,255)
-COLOR_RED = pygame.Color(255,0,0)
-COLOR_WHITE = pygame.Color(255,255,255)
-
-COLOR_BG = COLOR_WHITE
-COLOR_QUAD = COLOR_BLACK
-COLOR_OBS = COLOR_RED
-COLOR_SHEEP = COLOR_BLUE
-
-windowSurfaceObj = pygame.display.set_mode((640, 480))
-pygame.display.set_caption("IARC UAV Simulator")
-
-# TODO: Store roomba circles and obstacles
+roomba_list = initRoombas(20)
+obstacle_list = initObstacles(4)
+quadcopter = Quadcopter()
 
 # main loop
 while True:
-	windowSurfaceObj.fill(COLOR_BG)
-
-	# TODO: Render roomba circles and obstacles
-
-	fpsClock.tick(45)
+    windowSurfaceObj.fill(COLOR_BG)
+    #step through all objects
+    quadcopter.updatePosition()
+    drawQuadcopter(quadcopter)
+    for roomba in roomba_list:
+        roomba.updatePosition()
+        drawRoomba(roomba)
+    for obs in obstacle_list:
+        obs.updatePosition()
+        drawObstacle(obs)
+    
+    fpsClock.tick(45)
