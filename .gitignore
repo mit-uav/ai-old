@@ -57,3 +57,6 @@ target/
 *.avi
 *.AVI
 *.mp4
+
+# Folder location, etc
+.DS_STORE
