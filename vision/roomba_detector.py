@@ -1,9 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.misc import imread
-from scipy.signal import convolve2d
+from scipy.signal import convolve2d, fftconvolve
 from scipy.ndimage.filters import gaussian_filter, gaussian_laplace
 import os
+import cv2
 
 def disk_mask(n, r):
     '''Creates an nxn matrix with a circle of ones with radius r in its center'''
@@ -12,6 +13,10 @@ def disk_mask(n, r):
     x = np.arange(-n/2+1, n/2+1)
     mask = x*x+y*y <= r*r
     return mask
+
+def circle_mask(n, r):
+    mask = np.zeros((n, n))
+    return add_circle((int(n/2), int(n/2)), r, mask)
 
 def edges(img):
     '''Shows the edges of the red component of an input file. This seems to filter out glare, which doesn't have sharp edges like robotics vacuums. However, this still misses some roombas. I think we need to take color into consideration too'''
@@ -30,68 +35,54 @@ def runOnImg(func):
         if f.endswith('.jpg'):
             func('images/fake_roomba/'+f)
 
-def test(filename):
-    img = imread(filename)
-    plt.subplot(241)
-    plt.imshow(img)
-    plt.subplot(242)
-    plt.imshow(img[:,:,0])
-    plt.subplot(243)
-    plt.imshow(img[:,:,1])
-    plt.subplot(244)
-    plt.imshow(img[:,:,2])
+# def test(filename):
+#     img = imread(filename)
 
-    # plt.subplot(245)
-    # plt.imshow(edges(img))
-    plt.subplot(246)
-    plt.imshow(edges(img[:,:,0]))
-    plt.subplot(247)
-    plt.imshow(edges(img[:,:,1]))
-    plt.subplot(248)
-    plt.imshow(edges(img[:,:,2]))
-    plt.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1)
+def add_circle((i,j), r, img):
+    height, width = img.shape
+    # don't add pixels multiple times
+    pixels = set()
+    for theta in np.linspace(0, 2*np.pi, 1000):
+        di = int(i + r*np.sin(theta))
+        dj = int(j + r*np.cos(theta))
+
+        if 0 <= di < height and 0 <= dj < width:
+            if (di, dj) not in pixels:
+                img[di, dj] += 1
+                pixels.add((di, dj))
+    return img
+
+def test(img):
+    circles = cv2.HoughCircles(img, cv2.cv.CV_HOUGH_GRADIENT, 1.2, 10)
+    print 'Found %d circles' % len(circles)
+    res = img / 1024.
+    for (x, y, r) in circles[0]:
+        print (x, y, r)
+        res = add_circle((y, x), r, res)
+        res = add_circle((y, x), r+1, res)
+        res = add_circle((y, x), r+2, res)
+    plt.imshow(res)
     plt.show()
 
+
+
 if __name__ == '__main__':
-    # mask = disk_mask(100,10)
-    # plt.imshow(mask, interpolation='nearest')
+    # plt.imshow(circle_mask(100, 10))
     # plt.show()
-    # plt.imshow(edges('quad1.jpg'))
+    im = np.mean(imread('quad1.jpg'), axis=2).astype('uint8')
+    im = gaussian_filter(im, 1)
+    test(im)
+    # e = edges(im)
+    # e_min = np.min(e)
+    # e_max = np.max(e)
+    # e = (255 * (e - e_min)/(e_max-e_min)).astype('uint8')
+    #
+    # _, res = cv2.threshold(e,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+
+    # circles = np.zeros(im.shape)
+    # for (i, j) in zip(*np.where(res == 255)):
+    #     print (i,j)
+    #     circles = add_circle((i, j), 10, circles)
+
+    # plt.imshow(res)
     # plt.show()
-    img = imread('quad2.jpg')[:,:,1]
-    layer1 = img - gaussian_filter(img, 3)
-    plt.imshow(edges(layer1));plt.show()
-
-    # next_img = gaussian_filter(layer1, 1)[::2, ::2]
-    # layer2 = next_img - gaussian_filter(next_img, 3)
-
-    # next_img = gaussian_filter(layer2, 1)[::2, ::2]
-    # layer3 = next_img - gaussian_filter(next_img, 3)
-    #
-    # next_img = gaussian_filter(layer3, 1)[::2, ::2]
-    # layer4 = next_img - gaussian_filter(next_img, 3)
-    #
-    # next_img = gaussian_filter(layer4, 1)[::2, ::2]
-    # layer5 = next_img - gaussian_filter(next_img, 3)
-    #
-    # next_img = gaussian_filter(layer5, 1)[::2, ::2]
-    # layer6 = next_img - gaussian_filter(next_img, 3)
-    #
-    # next_img = gaussian_filter(layer6, 1)[::2, ::2]
-    # layer7 = next_img - gaussian_filter(next_img, 3)
-
-
-    # plt.subplot(221)
-    # plt.imshow(layer4)
-    # plt.subplot(222)
-    # plt.imshow(layer5)
-    # plt.subplot(223)
-    # plt.imshow(layer6)
-    # plt.subplot(224)
-    # plt.imshow(layer7)
-    # plt.show()
-
-    # e = edges(img[:,:,0])
-    # plt.imshow(edges(img[:,:,0]))
-    # plt.show()
-    # test('quad1.jpg')
