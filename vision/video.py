@@ -17,7 +17,8 @@ def findCircles(img):
 
     cimg = cv2.medianBlur(gray,5)
     # Want to change param 2
-    circles = cv2.HoughCircles(cimg,cv.CV_HOUGH_GRADIENT,1,200, param1=50,param2=40, minRadius=10,maxRadius=75)
+    #                                                           Canny,    how many circles
+    circles = cv2.HoughCircles(cimg,cv.CV_HOUGH_GRADIENT,1,200, param1=60,param2=40, minRadius=10,maxRadius=75)
     try:
         circles = np.uint16(np.around(circles))
         for c in circles[0,:]:
@@ -31,7 +32,7 @@ def findCircles(img):
     #vis = np.concatenate((cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR), img1, img2, img3), axis=1)
     cv2.imshow('Image Processing', img)
     # Wait for a keypress, and quit if it's q
-    if cv2.waitKey(0) & 0xFF == ord('q'):
+    if cv2.waitKey(25) & 0xFF == ord('q'):
         sys.exit(0)
 
 def cannyCircles(img):
@@ -52,7 +53,7 @@ for f in os.listdir('images/fake_roomba_scaled'):
 """
 
 # 0 for webcam
-cap = cv2.VideoCapture('data/low.avi')
+cap = cv2.VideoCapture('data/PICT0036.AVI')
 
 while(True):
     ret, frame = cap.read()
