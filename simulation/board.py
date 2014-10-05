@@ -16,7 +16,8 @@ class Board:
         pixelspermeter = 30     # number of pixels per meter
         for x in range(rCount): # initialize roombas
             randnum1 = random()
-            pos = Vector(50 + randnum1 * 550, 50 + randnum1 * 550, 0)   # random x and y positions within active part of board
+            pos = Vector(50 + 30 * x, 50 + 30 * x, 0)                   # put roombas in diagonal
+            # pos = Vector(50 + randnum1 * 550, 50 + randnum1 * 550, 0)   # random x and y positions within active part of board
             vel = Vector(cos(randnum1*2*pi), sin(randnum1*2*pi), 0)     # random velocities (magnitude 1 m/s)
             rCircle = Circle(Point(pos.x, pos.y), 9/2)                  # creating circle object for roomba
             self.rC.append(Roomba(pos, vel, rCircle))                   # add new Roomba object to list
