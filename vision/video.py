@@ -53,7 +53,7 @@ for f in os.listdir('images/fake_roomba_scaled'):
 """
 
 # 0 for webcam
-cap = cv2.VideoCapture('data/PICT0036.AVI')
+cap = cv2.VideoCapture('videos/fake_roomba/PICT0036.AVI')
 
 while(True):
     ret, frame = cap.read()
