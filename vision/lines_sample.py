@@ -1,9 +1,4 @@
 #!/usr/bin/python
-'''
-This example illustrates how to use Hough Transform to find lines
-Usage: ./houghlines.py [<image_name>]
-image argument defaults to ../cpp/pic1.png
-'''
 import cv2
 import numpy as np
 import sys
@@ -13,74 +8,107 @@ from scipy.ndimage.filters import gaussian_filter
 import numpy as np
 import math
 
-try:
-	fn = sys.argv[1]
-except:
-	fn = "arena.jpg"
-print __doc__
-src = cv2.imread(fn)
-red = src[:,:,0]
-red[red < 150] = 0
-# dst = cv2.Canny(red, 50, 200)
-# plt.imshow(dst)
-# plt.show()
-# cdst = cv2.cvtColor(dst, cv2.COLOR_GRAY2BGR)
-# plt.imshow(dst)
-# plt.show()
-# HoughLines()
-# lines = cv2.HoughLines(dst, 1, math.pi/180.0, 50, np.array([]), 0, 0)
-# a,b,c = lines.shape
-# for i in range(b):
-# rho = lines[0][i][0]
-# theta = lines[0][i][1]
-# a = math.cos(theta)
-# b = math.sin(theta)
-# x0, y0 = a*rho, b*rho
-# pt1 = ( int(x0+1000*(-b)), int(y0+1000*(a)) )
-# pt2 = ( int(x0-1000*(-b)), int(y0-1000*(a)) )
-# cv2.line(cdst, pt1, pt2, (0, 0, 255), 3, cv2.LINE_AA)
-lines = cv2.HoughLinesP(red, 1, math.pi/180.0, 100, np.array([]), 50, 20)
-print 'Found %d lines', lines.shape[1]
 
-# lines = [[[0,0,100,100]]]
-h, w = red.shape
-blank = np.zeros((h, w, 3))
+EPSILON = 1e-2
+ANGLE_EPSILON = .1
 
-lines2 = []
-for x1,y1,x2,y2 in lines[0]:
-	d = np.cross([x1,y1,1],[x2,y2,1])
-	lines2.append(d)
+def norm(x):
+	return math.sqrt(sum([y*y for y in x]))
+def equals(l1,l2):
+	return norm(np.cross(l1,l2))<EPSILON
+def angle(l):
+	if len(l)==3:
+		return math.atan2(l[1],l[0])
+	return math.atan2(l[3]-l[1],l[2]-l[0])
+def parallel(l1,l2):
+	return abs(abs(abs((angle(l1)-angle(l2))%(2*math.pi))-math.pi)-math.pi)<ANGLE_EPSILON
+def dist(x1,x2):
+	return math.sqrt((x2[0]-x1[0])**2+(x2[1]-x1[1])**2)
 
-	# angle = math.atan2((y2-y1), (x2-x1))
-	# lines2.append(d)
-	# dist = math.sqrt((x1-x2)**2 + (y1-y2)**2)
-	# mag = math.sqrt(np.dot(d,d)) / dist
-	# l2.append((mag, angle))
-	# plt.plot(mag, angle, 'ro')
 
-	# pt1 = (x1,y1)
-	# pt2 = (x2,y2)
-	# cv2.line(blank, pt1, pt2, (0,0,1), 1, cv2.CV_AA)
+def main():
+	try:
+		fn = sys.argv[1]
+	except:
+		fn = "house.JPG"
+	print __doc__
+	src = cv2.imread(fn)
+	red = src[:,:,0]
+	red[red < 150] = 0
+	lines = cv2.HoughLinesP(red, 1, math.pi/180.0, 50, np.array([]), 50, 20)
+	print 'Found %d lines' % lines.shape[1]
 
-vp = []
-for l1 in lines2:
-	for l2 in lines2:
-		pt = np.cross(l1, l2)
-		vp.append(pt)
-		x, y, w = pt
-		if w > 1:
-			plt.plot(x/w, y/w, 'ro')
-#
-# # plt.hist([a for (d,a) in l2], bins=20)
-plt.show()
-# plt.xlabel('d')
-# plt.ylabel('angle')
-# plt.show()
-# plt.imshow(blank)
-# plt.show()
-# a,b,c = lines.shape
-# for i in range(b):
-# 	cv2.line(blank, (lines[0][i][0], lines[0][i][1]), (lines[0][i][2], lines[0][i][3]), (0, 0, 255), 3, cv2.CV_AA)
-# cv2.imshow("source", blank)
-# cv2.imshow("detected lines", cdst)
-# cv2.waitKey(0)
+	# lines = [[[0,0,100,100]]]
+	h, w = red.shape
+	blank = np.zeros((h, w, 3))
+
+	lines2 = []
+	segs = []
+	for x1,y1,x2,y2 in lines[0]:
+		d = np.cross([x1,y1,1],[x2,y2,1])
+		lines2.append(d)
+		segs.append([x1,y1,x2,y2])
+
+	while True:
+		br = False
+		for i in xrange(len(segs)):
+			if br:
+				break
+			for j in xrange(i+1,len(segs)):
+				if br:
+					break
+				if parallel(segs[i],segs[j]):
+					a=segs[i][:2]+segs[j][2:]
+					b=segs[j][:2]+segs[i][2:]
+					if parallel(a,b):
+						x0=segs[i][:2]
+						x1=segs[i][2:]
+						x2=segs[j][:2]
+						x3=segs[j][2:]
+						if dist(x1,x2)>dist(x1,x0):
+							x0,x2 = x2,x0
+						if dist(x1,x3)>dist(x1,x0):
+							x0,x3 = x3,x0
+						if dist(x0,x2)>dist(x0,x1):
+							x1,x2 = x2,x1
+						if dist(x0,x3)>dist(x0,x1):
+							x1,x3 = x3,x1
+						#print '%s and %s became %s with angles %f and %f' % (segs[i],segs[j],x0+x1,angle(segs[i])-angle(segs[j]),angle(a)-angle(b))
+						segs[i] = x0 + x1
+						segs.pop(j)
+						br = True
+		if br:
+			continue
+		break
+	print 'Reduced to %d lines' % len(segs)
+	reduced = np.zeros((h, w, 3))
+	for x1,y1,x2,y2 in segs:
+		pt1 = (x1,y1)
+		pt2 = (x2,y2)
+		cv2.line(reduced, pt1, pt2, (0,0,1), 1, cv2.CV_AA)
+
+	lines2 = []
+	for x1,y1,x2,y2 in segs:
+		d = np.cross([x1,y1,1],[x2,y2,1])
+		lines2.append(d)
+
+	vp = []
+	for l1 in lines2:
+		for l2 in lines2:
+			if equals(l1,l2):
+				continue
+			if parallel(l1,l2):
+				continue
+			pt = np.cross(l1, l2)
+			vp.append(pt)
+			x, y, w = pt
+			if w > EPSILON:
+				plt.plot(x/w, y/w, 'ro')
+	print 'Found %d intersections' % len(vp)
+
+	plt.show()
+	plt.imshow(reduced[:,:,2])
+	plt.show()
+
+if __name__ == '__main__':
+	main()
