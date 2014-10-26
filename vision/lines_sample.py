@@ -14,24 +14,23 @@ ANGLE_EPSILON = .1
 
 def norm(x):
 	return math.sqrt(sum([y*y for y in x]))
+
 def equals(l1,l2):
 	return norm(np.cross(l1,l2))<EPSILON
+
 def angle(l):
 	if len(l)==3:
 		return math.atan2(l[1],l[0])
 	return math.atan2(l[3]-l[1],l[2]-l[0])
+
 def parallel(l1,l2):
 	return abs(abs(abs((angle(l1)-angle(l2))%(2*math.pi))-math.pi)-math.pi)<ANGLE_EPSILON
+
 def dist(x1,x2):
 	return math.sqrt((x2[0]-x1[0])**2+(x2[1]-x1[1])**2)
 
-
-def main():
-	try:
-		fn = sys.argv[1]
-	except:
-		fn = "house.JPG"
-	print __doc__
+def get_segments(fn):
+	'''Line segments from image. Returns [x1,y1,x2,y2], indexed from the top left of the image'''
 	src = cv2.imread(fn)
 	red = src[:,:,0]
 	red[red < 150] = 0
@@ -80,34 +79,17 @@ def main():
 		if br:
 			continue
 		break
-	print 'Reduced to %d lines' % len(segs)
-	reduced = np.zeros((h, w, 3))
-	for x1,y1,x2,y2 in segs:
-		pt1 = (x1,y1)
-		pt2 = (x2,y2)
-		cv2.line(reduced, pt1, pt2, (0,0,1), 1, cv2.CV_AA)
+	return segs
 
-	lines2 = []
-	for x1,y1,x2,y2 in segs:
-		d = np.cross([x1,y1,1],[x2,y2,1])
-		lines2.append(d)
 
-	vp = []
-	for l1 in lines2:
-		for l2 in lines2:
-			if equals(l1,l2):
-				continue
-			if parallel(l1,l2):
-				continue
-			pt = np.cross(l1, l2)
-			vp.append(pt)
-			x, y, w = pt
-			if w > EPSILON:
-				plt.plot(x/w, y/w, 'ro')
-	print 'Found %d intersections' % len(vp)
-
-	plt.show()
-	plt.imshow(reduced[:,:,2])
+def main():
+	try:
+		fn = sys.argv[1]
+	except:
+		fn = "arena.jpg"
+	segs = get_segments(fn)
+	for [x1,y1,x2,y2] in segs:
+		plt.plot([x1, x2], [-y1, -y2])
 	plt.show()
 
 if __name__ == '__main__':
