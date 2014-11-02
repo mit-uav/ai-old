@@ -2,17 +2,16 @@
 
 # Bayes dummy node to echo circles_node output
 
-import numpy as np
 import rospy
-from rospy.numpy_msg import numpy_msg
-from rospy_tutorials.msg import Floats
+from uav_msgs.msg import RoombaLocation, RoombaList, LineSegment, LineList
 
 def callback(data):
     print data
 
 def bayesMain():
     rospy.init_node('bayesDummy', anonymous=True)
-    rospy.Subscriber("roombas", numpy_msg(Floats), callback)
+    rospy.Subscriber("roombas", RoombaList, callback)
+    rospy.Subscriber("lines", LineList, callback)
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 

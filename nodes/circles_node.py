@@ -4,8 +4,7 @@ import numpy as np
 import cv2
 import cv2.cv as cv
 import rospy
-from rospy.numpy_msg import numpy_msg
-from rospy_tutorials.msg import Floats
+from uav_msgs.msg import RoombaLocation, RoombaList
 
 def findCircles(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -23,17 +22,17 @@ def findCircles(img):
 
 def circlesMain():
     # 0 for webcam
-    cap = cv2.VideoCapture('../vision/data/PICT0036.AVI')
+    cap = cv2.VideoCapture('/home/marcus/Documents/MIT/ExtraCurricular/UAV Team/iarc/iarc/vision/data/PICT0036.AVI')
     # ROS init stuff
-    pub = rospy.Publisher('roombas', numpy_msg(Floats), queue_size = 10)
+    pub = rospy.Publisher('roombas', RoombaList, queue_size = 10)
     rospy.init_node('circlesNode', anonymous=True)
     r = rospy.Rate(10) # 10hz
     while not rospy.is_shutdown():
         ret, frame = cap.read()
         circles = findCircles(frame)
         # c[0],c[1] is center, c[2] is radius
-        for c in circles:
-            pub.publish(c)
+        message = RoombaList(roombas = [RoombaLocation(x=c[0], y=c[1]) for c in circles], timestamp = rospy.Time.now())
+        pub.publish(message)
         r.sleep()
 
 # PyRos stuff
