@@ -88,9 +88,9 @@ def main():
 	except:
 		fn = "arena.jpg"
 	segs = get_segments(fn)
-	for [x1,y1,x2,y2] in segs:
-		plt.plot([x1, x2], [-y1, -y2])
-	plt.show()
+	# for [x1,y1,x2,y2] in segs:
+	# 	plt.plot([x1, x2], [-y1, -y2])
+	# plt.show()
 
 if __name__ == '__main__':
 	main()
