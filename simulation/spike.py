@@ -1,31 +1,35 @@
 from random import random, uniform
 from vector import *
 from math import cos, sin, pi
+import time
 
 class Spike:
 
-	def __init__(self, pos, vel, rCircle, phase):
+	def __init__(self, pos, vel, rCircle, phase,boardTime):
 		self.pos = pos
 		self.vel = vel
 		self.size = 9
-		self.r = 150
+		self.r = 5
 		self.circle = rCircle
-		self.spike = 1
 		self.phase = phase
-		self.count = 2 * pi * 1 / (self.vel.magnitude()/self.r) # count = 2pi/omega
-		self.t = 0
+		self.boardTime = boardTime
+
+		self.circum = self.r*2*pi
+		self.period = self.circum/vel.magnitude()
+
+		self.lastTime = self.boardTime.getTime()
+
+	def death(self):
+		if self.pos.y <= 25 or self.pos.y >= 625 or self.pos.x <= 25 or self.pos.x >= 625:
+			self.d = 1
+
 
 	def step(self):
-		omega = self.vel.magnitude()/self.r
-		#print omega
-		#print self.count
-
-		dx = self.r * omega * -sin(omega*self.t + self.phase * pi/2)
-		dy = self.r * omega * cos(omega*self.t + self.phase * pi/2)
-		if self.t >= self.count:
-			self.t = 0
-		else:
-			self.vel.x = dx
-			self.vel.y = dy
-			self.pos.add(Vector(dx, dy, 0))
-			self.t = self.t + 1
+		timeInterval = self.boardTime.getTime()-self.lastTime
+		self.lastTime = self.boardTime.getTime()
+		fraction = timeInterval/self.period
+		
+		self.vel.update_angle(fraction*2*pi)
+		
+		self.pos.add(Vector(timeInterval*self.vel.x*30, timeInterval*self.vel.y*30,0))
+		self.circle.updatePosition(self.pos)

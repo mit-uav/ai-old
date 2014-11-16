@@ -472,7 +472,6 @@ class GraphicsObject:
 
         """move object dx units in x direction and dy units in y
         direction"""
-        
         self._move(dx,dy)
         canvas = self.canvas
         if canvas and not canvas.isClosed():
@@ -545,10 +544,12 @@ class _BBox(GraphicsObject):
         self.p2 = p2.clone()
 
     def _move(self, dx, dy):
+        
         self.p1.x = self.p1.x + dx
         self.p1.y = self.p1.y + dy
         self.p2.x = self.p2.x + dx
         self.p2.y = self.p2.y  + dy
+
                 
     def getP1(self): return self.p1.clone()
 
@@ -608,6 +609,10 @@ class Circle(Oval):
         
     def getRadius(self):
         return self.radius
+
+    def updatePosition(self, p):
+        self.p1 = Point(p.x-self.radius, p.y-self.radius)
+        self.p2 = Point(p.x+self.radius, p.y+self.radius)
               
 class Line(_BBox):
     
