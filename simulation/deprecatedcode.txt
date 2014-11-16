@@ -1,0 +1,3 @@
+#randnum1 = random()
+#pos = Vector(25 + 600/rCount * x, 25 + 600/rCount * x, 0)                   # put roombas in diagonal
+# pos = Vector(50 + randnum1 * 550, 50 + randnum1 * 550, 0)   # random x and y positions within active part of board

@@ -10,14 +10,10 @@ class Spike:
 		self.size = 9
 		self.r = 150
 		self.circle = rCircle
+		self.spike = 1
 		self.phase = phase
 		self.count = 2 * pi * 1 / (self.vel.magnitude()/self.r) # count = 2pi/omega
 		self.t = 0
-
-	def death(self):
-		if self.pos.y <= 25 or self.pos.y >= 625 or self.pos.x <= 25 or self.pos.x >= 625:
-			self.d = 1
-
 
 	def step(self):
 		omega = self.vel.magnitude()/self.r
