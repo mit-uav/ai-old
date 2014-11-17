@@ -23,8 +23,9 @@ class Board:
             pos = Vector(boardCenter + 30*sin(theta*x), boardCenter + 30*cos(theta*x), 0)                   # put roombas in diagonal
             vel = Vector(sin(theta*x)/3, cos(theta*x)/3, 0)                # random velocities (magnitude 1 m/s)
             rCircle = Circle(Point(pos.x, pos.y), 9.0/2)                   # creating circle object for roomba
-            #rLine = Line()
-            self.rC.append(Roomba(pos, vel, rCircle,self.boardTime))       # add new Roomba object to list
+            rLine = Line(Point(pos.x,pos.y), Point(pos.x+vel.x*30, pos.y+vel.y*30))
+
+            self.rC.append(Roomba(pos, vel, rCircle, rLine, self.boardTime))       # add new Roomba object to list
         for i in range(sCount): # initialize spike roombas at theta = 0, pi/2, pi, and 3pi/2
             pos = Vector(30 * width / 2 + 25 + cos(i*pi/2) * 5 * 30,30 * height / 2 + 25 + sin(i*pi/2) * 5 * 30, 0) 
             vel = Vector(-sin(i*pi/2)/3, cos(i*pi/2)/3, 0)
@@ -86,7 +87,10 @@ class Board:
         
         for r in self.rC:   # draw roombas
             r.circle.setFill(color_rgb(0, 0, 0))
-            r.circle.draw(self.win)        
+            r.circle.draw(self.win)
+            r.velVect.draw(self.win)
+
+            print r.velVect
         
         for r in self.srC:  # draw spike roombas
             r.circle.setFill(color_rgb(0,0,150))
@@ -144,6 +148,9 @@ class Board:
                 # moves roombas by drawing and undrawing - laggy
                 r.circle.undraw()
                 r.circle.draw(self.win)
+                if r in self.rC:
+                    r.velVect.undraw()
+                    r.velVect.draw(self.win)
 
                 r.step()
                 #Point(r.pos.x,r.pos.y).draw(self.win)   # traces roomba path - laggy

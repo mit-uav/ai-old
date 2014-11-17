@@ -637,6 +637,10 @@ class Line(_BBox):
         if not option in ["first","last","both","none"]:
             raise GraphicsError(BAD_OPTION)
         self._reconfig("arrow", option)
+
+    def updatePosition(self, s, t):
+        self.p1 = Point(s.x, s.y)
+        self.p2 = Point(s.x+t.x*50, s.y+t.y*50)
         
 
 class Polygon(GraphicsObject):

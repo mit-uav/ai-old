@@ -2,11 +2,12 @@ from random import random, uniform
 from vector import *
 from math import pi
 from timeMultiplier import *
+from graphics import *
 import time
 
 class Roomba:
 
-	def __init__(self, pos, vel, rCircle, boardTime):
+	def __init__(self, pos, vel, rCircle, rLine, boardTime):
 		self.pos = pos
 		self.vel = vel
 		self.turning = False
@@ -14,6 +15,7 @@ class Roomba:
 		
 		self.size = 9
 		self.circle = rCircle
+		self.velVect = rLine
 		self.d = 0
 		self.boardTime = boardTime
 		self.lastAngle = self.boardTime.getTime()
@@ -25,7 +27,6 @@ class Roomba:
 		if self.pos.y <= 25 or self.pos.y >= 625 or self.pos.x <= 25 or self.pos.x >= 625:
 			self.d = 1
 			print "DEAD"
-
 
 
 	def step(self):
@@ -55,7 +56,7 @@ class Roomba:
 
 
 		self.circle.updatePosition(self.pos)
-
+		self.velVect.updatePosition(self.pos, self.vel)
 
 	def turn(self):
 		self.vel.update_angle(pi/4)
