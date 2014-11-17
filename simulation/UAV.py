@@ -50,7 +50,9 @@ class UAV:
 
 		if distanceToTarget < 8:
 			if self.target !=self.BoardCenter:
-				self.roombaList[self.targetNum].turn()
+				self.roombaList[self.targetNum].turn()  # can you turn the roomba if the
+																								# roomba is currently turning?
+
 			#priorityList = [priority(r) for r in self.roombaList]
 			if len(self.targetList) > 0:
 				self.targetNum = self.targetList.pop(0)
@@ -76,6 +78,8 @@ def priority(r):
 def findTarget(roombaList):
 	#y = [r.pos.y for r in roombaList]
 	#roombaList = [roombaList for (y,roombaList) in sorted(zip(y,roombaList))]
+
+	# there is now a major bug where UAV struggles to evaluate a currently turning roomba
 	for r in roombaList:
 		if -1*r.vel.y <= abs(r.vel.x):
 			theta = atan2(-1*r.vel.y, r.vel.x)

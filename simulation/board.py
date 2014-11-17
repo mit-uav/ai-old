@@ -15,7 +15,7 @@ class Board:
         self.height = height    # width of board in meters
         self.rC = []            # roomba list
         self.srC = []           # spike roomba list
-        self.boardTime = TimeMultiplier(3)
+        self.boardTime = TimeMultiplier(2)
         pixelspermeter = 30     # number of pixels per meter
         theta = 2*pi/rCount
         boardCenter = (width/2)*pixelspermeter+25
@@ -23,8 +23,7 @@ class Board:
             pos = Vector(boardCenter + 30*sin(theta*x), boardCenter + 30*cos(theta*x), 0)                   # put roombas in diagonal
             vel = Vector(sin(theta*x)/3, cos(theta*x)/3, 0)                # random velocities (magnitude 1 m/s)
             rCircle = Circle(Point(pos.x, pos.y), 9.0/2)                   # creating circle object for roomba
-            rLine = Line(Point(pos.x,pos.y), Point(pos.x+vel.x*30, pos.y+vel.y*30))
-
+            rLine = Line(Point(pos.x,pos.y), Point(pos.x+vel.x*50, pos.y+vel.y*50)) # velcoity vector line
             self.rC.append(Roomba(pos, vel, rCircle, rLine, self.boardTime))       # add new Roomba object to list
         for i in range(sCount): # initialize spike roombas at theta = 0, pi/2, pi, and 3pi/2
             pos = Vector(30 * width / 2 + 25 + cos(i*pi/2) * 5 * 30,30 * height / 2 + 25 + sin(i*pi/2) * 5 * 30, 0) 
@@ -105,14 +104,16 @@ class Board:
 
     # Collision check: if distance between roomba centers is less than a threshold, they've collided
     # 1 for collision, 0 for no collision
-    def collision(self, pos1, pos2):
-        r = 81
-        dx = pos1.x - pos2.x
-        dy = pos1.y - pos2.y
-        if r > dx*dx + dy*dy:
-            return 1
+    def collision(self, r, otherPos):
+        threshold = 64
+        x = r.pos.x + r.vel.x*12
+        y = r.pos.y + r.vel.y*12
+        dx = x - otherPos.x
+        dy = y - otherPos.y
+        if threshold > dx*dx + dy*dy:
+            return True
         else:
-            return 0
+            return False
 
     # the primary method for running the simulation
     def run(self):
@@ -136,9 +137,10 @@ class Board:
                 e = [d.pop(0)] * len(d)
                 cDetect = cDetect + zip(e, d)
             for x in cDetect:
-                if self.collision(self.rCsrC[x[0]].pos, self.rCsrC[x[1]].pos): # if there is a collision, reverse directions of both roombas
+                if self.collision(self.rCsrC[x[0]], self.rCsrC[x[1]].pos): # if there is a collision, reverse directions of both roombas
                     if self.rCsrC[x[0]] in self.rC and self.rCsrC[x[0]].turning == False:
                         self.rC[x[0]].flip()
+                if self.collision(self.rCsrC[x[1]], self.rCsrC[x[0]].pos):
                     if self.rCsrC[x[1]] in self.rC and self.rCsrC[x[1]].turning == False:
                         self.rC[x[1]].flip()
             for r in self.rCsrC :  # draw updated roombas
