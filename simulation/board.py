@@ -155,20 +155,18 @@ class Board:
                     r.velVect.draw(self.win)
 
                 r.step()
+                
                 #Point(r.pos.x,r.pos.y).draw(self.win)   # traces roomba path - laggy
             
-            # draw updated UAV
+            # draw updated UAV with move function
             #self.uav.circle.move(timeInterval*self.uav.vel.x*30, timeInterval*self.uav.vel.y*30)
             
+            # draw updated UAV by drawing and undrawing
             self.uav.circle.undraw()
             self.uav.circle.draw(self.win)
-            #Point(self.uav.pos.x,self.uav.pos.y).draw(self.win)
             
             self.uav.update(self.rC,self.srC)
             self.uav.step()
-
-
-
 
             self.win.update()
         self.stop()                 # quit the simulation
