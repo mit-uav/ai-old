@@ -19,8 +19,7 @@ class UAV:
 		self.spikeList = spikeList
 
 		self.targetNum = -1
-		self.targetList = [3]*6 +[2]*6 +[1]*5 +[0]*4 +[9]*3 +[8]*3 +[7]*2 +[6]*2 +[-1]*300 
-		self.targetList +=[6]*4 +[5]*4 +[4]*4 +[3]*3 +[2]*4 +[1]*4 +[0]*4 +[9]*4 +[8]*4 +[7]*4 #+[-1]*240
+		self.targetList = [0]
 		self.BoardCenter = Point(325.0,200.0)
 		
 		#self.targetPosition = self.target.pos.x
@@ -75,12 +74,28 @@ class UAV:
 def priority(r):
 		return r.pos.y/30 + (r.vel.y/abs(r.vel.x))*20
 
+def sort(roombaList):
+	print [r.pos.y for r in roombaList]
+	sortedList = [roombaList[0]]
+	for r in roombaList[1:]:
+		inserted = False
+		for i in range(len(sortedList)):
+			if r.pos.y < sortedList[i].pos.y and not inserted:
+				sortedList.insert(i,r)
+				inserted = True
+		if not inserted:
+			sortedList.append(r)
+	print [r.pos.y for r in sortedList]
+	return sortedList
+
+		
+
 def findTarget(roombaList):
 	#y = [r.pos.y for r in roombaList]
 	#roombaList = [roombaList for (y,roombaList) in sorted(zip(y,roombaList))]
-
+	sortedRoombaList = sort(roombaList)
 	# there is now a major bug where UAV struggles to evaluate a currently turning roomba
-	for r in roombaList:
+	for r in sortedRoombaList:
 		if -1*r.vel.y <= abs(r.vel.x):
 			theta = atan2(-1*r.vel.y, r.vel.x)
 			turn = 1

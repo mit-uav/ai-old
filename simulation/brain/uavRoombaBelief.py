@@ -7,7 +7,8 @@ import time
 
 class Roomba:
 
-	def __init__(self, pos, vel, rCircle, rLine, boardTime):
+	def __init__(self, roombaNum, pos, vel, boardTime):
+		self.roombaNum = roombaNum
 		self.pos = pos
 		self.vel = vel
 		self.turning = False
