@@ -105,25 +105,31 @@ def findTarget(roombaList):
     print [angleCost(r) for r in sortedRoombaList]
     # there is now a major bug where UAV struggles to evaluate a currently turning roomba
     for r in sortedRoombaList:
-        if -1*r.vel.y <= abs(r.vel.x):
-            theta = atan2(-1*r.vel.y, r.vel.x)
-            turn = 1
-            accountforposition = 0
-            if pi/4>theta>0:
-                    turn = 7
-            if 0>theta> -pi/4:
-                    turn = 6
-            if -1*pi/4>theta> -1*pi/2:
-                    turn = 5
-            if -1*pi/2>theta>-3*pi/4:
-                    turn = 4
-            if -1*3*pi/4>theta> -1*pi:
-                    turn = 3
-            if pi>theta> 3*pi/4:
-                    turn = 2
-            if r.pos.x > 450:
-                    accountforposition = -1
-            if r.pos.x < 200:
-                    accountforposition = 1
-            return [roombaList.index(r)]*(turn-1+ accountforposition)
+	actualX = r.pos.x - 25
+	actualY = r.pos.y - 25
+	[TL, BL] = [atan2(actualX, actualY) + pi/2, atan2(600-actualY, actualX) + pi]
+	[BR, TR] = [atan2(600-actualX, 600-actualY) + 3*pi/2, atan2(actualY, 600-actualX)]
+    	angle = (atan2(-r.vel.y, r.vel.x) + 2*pi) % 2*pi
+	print 'angle: ', angle*(180/pi)
+
+        if not TR <= angle <= TL:
+	    turn_guess = math.floor((((angle + 2*pi) - pi/2) % 2*pi)/(pi/4))
+	    new_angle = (((angle - turn_guess*pi/4) + 2*pi) % 2*pi) 
+	    if TR <= new_angle <= TL:
+		print "ALREADY GOOD CASE" 
+		turn = int(turn_guess)
+		print 'turns: ', turn
+		return [roombaList.index(r)]*(turn)			
+	    else:
+		if new_angle > TL:
+		    print "UNDERSHOT"
+		    turn = int(turn_guess + 1)
+		    print 'turns: ', turn
+		    return [roombaList.index(r)]*(turn)
+		if new_angle < TR:
+		    print "OVERSHOT"
+		    turn = int(turn_guess - 1)
+		    print 'turns: ', turn
+		    return [roombaList.index(r)]*(turn)
+
     return [-1]
