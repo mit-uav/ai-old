@@ -74,25 +74,25 @@ def priority(r):
 def angleCost(r):
     actualX = r.pos.x-25
     actualY = r.pos.y-25
-    [TL, BL] = [atan2(actualY, actualX) + pi/2, atan2(600-actualY, actualX) + pi]
-    [BR, TR] = [atan2(600-actualY, 600-actualX) + 3*pi/2, atan2(r.pos.y, 600-actualX)]
-    angle = atan2(-r.vel.y, r.vel.x)
+    [TL, BL] = [atan2(actualX, actualY) + pi/2, atan2(600-actualY, actualX) + pi]
+    [BR, TR] = [atan2(600-actualX, 600-actualY) + 3*pi/2, atan2(actualY, 600-actualX)]
+    angle = (atan2(-r.vel.y, r.vel.x) + 2*pi) % 2*pi
 
     print "TL, BL, BR, TR: ", TL, BL, BR, TR
 
     print "angle: ", angle
-    if TL <= angle <= BL:
-	C = .1
+    if TR <= angle < TL:
+	C = 10
 	return C / (actualY/sin(angle))
-    elif BL <= angle <= BR:
-	C = 100
-	return C / (actualX/sin(angle-pi/2))
-    elif BR <= angle <= 2*pi or 0 <= angle <= TR:
-	C = 100
-	return C / ((600-actualY)/sin(angle-pi))
-    elif TR <= angle <= TL:
-	C = 100
-	return C / ((600-actualX)/sin(angle-3*pi/2))
+    elif TL <= angle < BL:
+	C = 10000
+	return C / (actualX/abs(cos(angle)))
+    elif BL <= angle < BR:
+	C = 10000
+	return C / ((600-actualY)/abs(sin(angle)))
+    elif BL <= angle < 2*pi or 0 <= angle < TR:
+	C = 10000
+	return C / ((600-actualX)/cos(angle))
     return -1
 	
 	
