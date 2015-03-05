@@ -20,7 +20,7 @@ class UAV:
 
         self.targetNum = -1
         self.targetList = [0]
-        self.BoardCenter = Point(325.0,200.0)
+        self.NeutralTarget = Point(325.0,325.0)   # default to board center
         
     def death(self):
         if self.pos.y <= 25 or self.pos.y >= 625 or self.pos.x <= 25 or self.pos.x >= 625:
@@ -37,7 +37,12 @@ class UAV:
         if self.targetNum != -1 and self.targetNum < len(self.roombaList):
             self.target = self.roombaList[self.targetNum].pos
         else:
-            self.target = self.BoardCenter
+			xlist = [r.pos.x for r in self.roombaList if not(r.d)]
+			ylist = [r.pos.y for r in self.roombaList if not(r.d)]
+			avgX = sum(xlist)/len(xlist)
+			avgY = sum(ylist)/len(ylist)	
+            		self.NeutralTarget = Point(avgX, avgY)
+			self.target = self.NeutralTarget
         
         # plant (motion of quad)
         distanceToTarget = (self.pos.x-self.target.x)**2 + (self.pos.x-self.target.x)**2
@@ -51,7 +56,7 @@ class UAV:
         # unresolved: can you turn the roomba if the roomba is currently turning?
         # controller when close to target
             print "distance to target", distanceToTarget
-            if self.target !=self.BoardCenter:
+            if self.target !=self.NeutralTarget:
                 self.roombaList[self.targetNum].turn() 
             if len(self.targetList) > 0:
                 self.targetNum = self.targetList.pop(0)
@@ -98,7 +103,7 @@ def angleCost(r):
 def sort(roombaList):
     return sorted(roombaList, key = lambda roomba : angleCost(roomba))
 
-def findTarget(roombaList):
+def findTargetOld(roombaList):
     #y = [r.pos.y for r in roombaList]
     #roombaList = [roombaList for (y,roombaList) in sorted(zip(y,roombaList))]
     sortedRoombaList = sort(roombaList)
