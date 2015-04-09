@@ -22,9 +22,6 @@ class UAV:
 		self.targetList = [0]
 		self.BoardCenter = Point(325.0,200.0)
 		
-		#self.targetPosition = self.target.pos.x
-		
-
 	def death(self):
 		if self.pos.y <= 25 or self.pos.y >= 625 or self.pos.x <= 25 or self.pos.x >= 625:
 			self.d = 1
@@ -34,37 +31,36 @@ class UAV:
 		self.roombaList = newRoobaList
 		self.spikeList = newSpikeList
 
-
-
 	def step(self):
 		self.death()
+
+		# controller (choosing target)
 		if self.targetNum != -1 and self.targetNum < len(self.roombaList):
 			self.target = self.roombaList[self.targetNum].pos
 		else:
 			self.target = self.BoardCenter
+		
+		# plant (motion of quad)
 		distanceToTarget = (self.pos.x-self.target.x)**2 + (self.pos.x-self.target.x)**2
 		directiontoTarget = Vector(self.target.x-self.pos.x, self.target.y-self.pos.y, 0)
 		self.vel = directiontoTarget
 		self.vel.scale(self.maxSpeed/(self.vel.magnitude()+.01))
 
-		if distanceToTarget < 8:
-			if self.target !=self.BoardCenter:
-				self.roombaList[self.targetNum].turn()  # can you turn the roomba if the
-																								# roomba is currently turning?
 
-			#priorityList = [priority(r) for r in self.roombaList]
+
+		if distanceToTarget < 8:
+			# unresolved: can you turn the roomba if the roomba is currently turning?
+			# controller when close to target
+			print "distance to target", distanceToTarget
+			if self.target !=self.BoardCenter:
+				self.roombaList[self.targetNum].turn() 
 			if len(self.targetList) > 0:
 				self.targetNum = self.targetList.pop(0)
 			else:
 				#self.targetNum = -1
 				self.targetList+=findTarget(self.roombaList)
-				
 		
-				
-
-				
-		# add a comment here		
-
+		# plant (motion of quad)
 		timeInterval = self.boardTime.getTime()-self.lastTime
 		self.lastTime = self.boardTime.getTime()
 		#if self.vel.magnitude > self.maxSpeed*30:
