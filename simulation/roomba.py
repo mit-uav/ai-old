@@ -33,7 +33,7 @@ class Roomba:
 	#	print 'Time'
 	#	print self.boardTime.getTime() - self.lastAngle
 	#	print self.boardTime.getTime() - self.lastTurn
-		print self.boardTime.getTime()
+		#print self.boardTime.getTime()
 
 		self.death()
 

@@ -1,5 +1,5 @@
 from vector import *
-from math import pi, cos, sin, atan2
+from math import pi, cos, sin, tan, atan2
 from timeMultiplier import *
 from random import random, randrange
 from graphics import Point
@@ -71,13 +71,39 @@ class UAV:
 def priority(r):
     return r.pos.y/30 + (r.vel.y/abs(r.vel.x))*20
 
+def angleCost(r):
+    actualX = r.pos.x-25
+    actualY = r.pos.y-25
+    [TL, BL] = [atan2(actualY, actualX) + pi/2, atan2(600-actualY, actualX) + pi]
+    [BR, TR] = [atan2(600-actualY, 600-actualX) + 3*pi/2, atan2(r.pos.y, 600-actualX)]
+    angle = atan2(-r.vel.y, r.vel.x)
+
+    print "TL, BL, BR, TR: ", TL, BL, BR, TR
+
+    print "angle: ", angle
+    if TL <= angle <= BL:
+	C = .1
+	return C / (actualY/sin(angle))
+    elif BL <= angle <= BR:
+	C = 100
+	return C / (actualX/sin(angle-pi/2))
+    elif BR <= angle <= 2*pi or 0 <= angle <= TR:
+	C = 100
+	return C / ((600-actualY)/sin(angle-pi))
+    elif TR <= angle <= TL:
+	C = 100
+	return C / ((600-actualX)/sin(angle-3*pi/2))
+    return -1
+	
+	
 def sort(roombaList):
-    return sorted(roombaList, key = lambda roomba : roomba.pos.y)
+    return sorted(roombaList, key = lambda roomba : angleCost(roomba))
 
 def findTarget(roombaList):
     #y = [r.pos.y for r in roombaList]
     #roombaList = [roombaList for (y,roombaList) in sorted(zip(y,roombaList))]
     sortedRoombaList = sort(roombaList)
+    print [angleCost(r) for r in sortedRoombaList]
     # there is now a major bug where UAV struggles to evaluate a currently turning roomba
     for r in sortedRoombaList:
         if -1*r.vel.y <= abs(r.vel.x):
