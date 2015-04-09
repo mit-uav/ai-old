@@ -71,21 +71,8 @@ class UAV:
 def priority(r):
 		return r.pos.y/30 + (r.vel.y/abs(r.vel.x))*20
 
-def sort(roombaList):
-	print [r.pos.y for r in roombaList]
-	sortedList = [roombaList[0]]
-	for r in roombaList[1:]:
-		inserted = False
-		for i in range(len(sortedList)):
-			if r.pos.y < sortedList[i].pos.y and not inserted:
-				sortedList.insert(i,r)
-				inserted = True
-		if not inserted:
-			sortedList.append(r)
-	print [r.pos.y for r in sortedList]
-	return sortedList
-
-		
+def sort(roombaList): 
+    return sorted(roombaList, key = lambda roomba : roomba.pos.y)
 
 def findTarget(roombaList):
 	#y = [r.pos.y for r in roombaList]
