@@ -128,10 +128,8 @@ class Board:
                     r.circle.undraw()
                     self.rC.remove(r)
                     self.rCsrC.remove(r)
-            if self.uav.d == 1:     # remove dead UAV
-                self.uav.circle.undraw()
 
-            cDetect = []                    # list of roombas pairs
+            cDetect = []                    # list of roomba pairs
             for x in range(len(self.rCsrC)):   # generates all possible unique pairs of roombas
                 d = range(x, len(self.rCsrC))
                 e = [d.pop(0)] * len(d)
@@ -143,6 +141,12 @@ class Board:
                 if self.collision(self.rCsrC[x[1]], self.rCsrC[x[0]].pos):
                     if self.rCsrC[x[1]] in self.rC and self.rCsrC[x[1]].turning == False:
                         self.rC[x[1]].flip()
+            if self.uav.d != 1:
+                for spike_roomba in self.srC:       # check for UAV collision w/ spike roomba
+                    if self.collision(spike_roomba, self.uav.pos):
+                        print "The UAV has collided with a spike roomba."
+                        self.uav.d = 1
+                        self.uav.circle.undraw()
             for r in self.rCsrC :  # draw updated roombas
                 # moves roombas with move function - uses less processing time
                 #r.circle.move(timeInterval*r.vel.x*30, timeInterval*r.vel.y*30)
@@ -161,12 +165,15 @@ class Board:
             # draw updated UAV with move function
             #self.uav.circle.move(timeInterval*self.uav.vel.x*30, timeInterval*self.uav.vel.y*30)
             
-            # draw updated UAV by drawing and undrawing
-            self.uav.circle.undraw()
-            self.uav.circle.draw(self.win)
-            
-            self.uav.update(self.rC,self.srC)
-            self.uav.step()
+
+            if self.uav.d != 1:
+                # draw updated UAV by drawing and undrawing
+
+                self.uav.circle.undraw()
+                self.uav.circle.draw(self.win)
+                
+                self.uav.update(self.rC,self.srC)
+                self.uav.step()
 
             self.win.update()
         self.stop()                 # quit the simulation

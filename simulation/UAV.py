@@ -60,15 +60,8 @@ class UAV:
 				priorityList = [priority(r) for r in self.roombaList]
 				targetRoombaIndex = priorityList.index(max(priorityList))
 				#self.targetNum = -1
-				#self.targetList+=findTarget(self.roombaList)		# old line with rudimentary AI
 				self.targetList += generateList(targetRoombaIndex, self.roombaList)
-				
-		
-				
-
-				 
-		# add a comment here		
-
+							 
 		timeInterval = self.boardTime.getTime()-self.lastTime
 		self.lastTime = self.boardTime.getTime()
 		#if self.vel.magnitude > self.maxSpeed*30:
@@ -82,7 +75,7 @@ def priority(r):
 		boardHeight = 600
 		distcomp = (r.pos.y)/boardHeight
 		directioncomp = abs((atan2(-1*r.vel.y, r.vel.x)-math.pi/2)/(math.pi))
-		[distwt, dirwt] = [.8, .2]
+		[distwt, dirwt] = [.6, .4]
 		return distwt*distcomp+directioncomp*dirwt
 
 def findTarget(roombaList):
@@ -93,26 +86,6 @@ def findTarget(roombaList):
 	for r in roombaList:
 		if -1*r.vel.y <= abs(r.vel.x):
 			return generateList(roombaList.index(r), roombaList)
-			# theta = atan2(-1*r.vel.y, r.vel.x)
-			# turn = 1
-			# accountforposition = 0
-			# if pi/4>theta>0:
-			# 	turn = 7
-			# if 0>theta> -pi/4:
-			# 	turn = 6
-			# if -1*pi/4>theta> -1*pi/2:
-			# 	turn = 5
-			# if -1*pi/2>theta>-3*pi/4:
-			# 	turn = 4
-			# if -1*3*pi/4>theta> -1*pi:
-			# 	turn = 3
-			# if pi>theta> 3*pi/4:
-			# 	turn = 2
-			# if r.pos.x > 450:
-			# 	accountforposition = -1
-			# if r.pos.x < 200:
-			# 	accountforposition = 1
-			# return [roombaList.index(r)]*(turn-1+ accountforposition)
 	return [-1]
 
 # generates list to be interpreted by UAV driver
