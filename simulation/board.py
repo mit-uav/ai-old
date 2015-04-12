@@ -15,7 +15,7 @@ class Board:
         self.height = height    # width of board in meters
         self.rC = []            # roomba list
         self.srC = []           # spike roomba list
-        self.boardTime = TimeMultiplier(1)
+        self.boardTime = TimeMultiplier(15)
         pixelspermeter = 30     # number of pixels per meter
         theta = 2*pi/rCount
         boardCenter = (width/2)*pixelspermeter+25
