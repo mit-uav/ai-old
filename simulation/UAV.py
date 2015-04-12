@@ -24,8 +24,7 @@ class UAV:
         
     def death(self):
         if self.pos.y <= 25 or self.pos.y >= 625 or self.pos.x <= 25 or self.pos.x >= 625:
-                    self.d = 1
-        print "DEAD"
+        	self.d = 1
 
     def update(self, newRoobaList, newSpikeList):
         self.roombaList = newRoobaList
@@ -60,13 +59,13 @@ class UAV:
                 #self.targetNum = -1
                 self.targetList+=findTarget(self.roombaList)
         
-            # plant (motion of quad)
-            timeInterval = self.boardTime.getTime()-self.lastTime
-            self.lastTime = self.boardTime.getTime()
-            #if self.vel.magnitude > self.maxSpeed*30:
-            #	self.vel.scale(self.maxSpeed/self.vel.magnitude())
-            self.pos.add(Vector(timeInterval*self.vel.x*30, timeInterval*self.vel.y*30,0))
-            self.circle.updatePosition(self.pos)
+        # plant (motion of quad)
+        timeInterval = self.boardTime.getTime()-self.lastTime
+        self.lastTime = self.boardTime.getTime()
+        #if self.vel.magnitude > self.maxSpeed*30:
+        #	self.vel.scale(self.maxSpeed/self.vel.magnitude())
+        self.pos.add(Vector(timeInterval*self.vel.x*30, timeInterval*self.vel.y*30,0))
+        self.circle.updatePosition(self.pos)
 
 def priority(r):
     return r.pos.y/30 + (r.vel.y/abs(r.vel.x))*20

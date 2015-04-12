@@ -176,5 +176,5 @@ class Board:
     def stop(self):
         self.win.getMouse()
     
-myboard = Board(20, 20, 10, 4)
+myboard = Board(20, 20, 3, 4)
 myboard.run()
