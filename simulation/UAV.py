@@ -62,7 +62,7 @@ class UAV:
                 self.targetNum = self.targetList.pop(0)
             else:
                 #self.targetNum = -1
-                self.targetList+=findTarget(self.roombaList)
+                self.targetList+=findTargetOld(self.roombaList)
         
         # plant (motion of quad)
         timeInterval = self.boardTime.getTime()-self.lastTime
@@ -103,7 +103,7 @@ def angleCost(r):
 def sort(roombaList):
     return sorted(roombaList, key = lambda roomba : angleCost(roomba))
 
-def findTargetOld(roombaList):
+def findTarget(roombaList):
     #y = [r.pos.y for r in roombaList]
     #roombaList = [roombaList for (y,roombaList) in sorted(zip(y,roombaList))]
     sortedRoombaList = sort(roombaList)
@@ -137,4 +137,34 @@ def findTargetOld(roombaList):
 		    print 'turns: ', turn
 		    return [roombaList.index(r)]*(turn)
 
+    return [-1]
+
+def findTargetOld(roombaList):
+    #y = [r.pos.y for r in roombaList]
+    #roombaList = [roombaList for (y,roombaList) in sorted(zip(y,roombaList))]
+    sortedRoombaList = sort(roombaList)
+    print [angleCost(r) for r in sortedRoombaList]
+    # there is now a major bug where UAV struggles to evaluate a currently turning roomba
+    for r in sortedRoombaList:
+        if -1*r.vel.y <= abs(r.vel.x):
+            theta = atan2(-1*r.vel.y, r.vel.x)
+            turn = 1
+            accountforposition = 0
+            if pi/4>theta>0:
+                    turn = 7
+            if 0>theta> -pi/4:
+                    turn = 6
+            if -1*pi/4>theta> -1*pi/2:
+                    turn = 5
+            if -1*pi/2>theta>-3*pi/4:
+                    turn = 4
+            if -1*3*pi/4>theta> -1*pi:
+                    turn = 3
+            if pi>theta> 3*pi/4:
+                    turn = 2
+            if r.pos.x > 450:
+                    accountforposition = -1
+            if r.pos.x < 200:
+                    accountforposition = 1
+            return [roombaList.index(r)]*(turn-1+ accountforposition)
     return [-1]
