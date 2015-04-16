@@ -45,7 +45,7 @@ class UAV:
 	    self.target = self.NeutralTarget
         
         # plant (motion of quad)
-        distanceToTarget = (self.pos.x-self.target.x)**2 + (self.pos.x-self.target.x)**2
+        distanceToTarget = math.sqrt((self.pos.x-self.target.x)**2 + (self.pos.y-self.target.y)**2)
         directiontoTarget = Vector(self.target.x-self.pos.x, self.target.y-self.pos.y, 0)
         self.vel = directiontoTarget
         self.vel.scale(self.maxSpeed/(self.vel.magnitude()+.01))
@@ -60,7 +60,8 @@ class UAV:
                 self.targetNum = self.targetList.pop(0)
             else:
                 #self.targetNum = -1
-                self.targetList+=findTarget(self.roombaList)
+                print 'findTarget(self.roombaList): ', findTarget(self.roombaList)
+                self.targetList+=findTarget(self.roombaList) 
         
         # plant (motion of quad)
         timeInterval = self.boardTime.getTime()-self.lastTime
@@ -134,7 +135,7 @@ def findTarget(roombaList):
 		    turn = int(turn_guess + 1)
                     print '========== NEW ANGLE LESS THAN TL: turns: ', turn
 		    return [roombaList.index(r)]*(turn)
-		if new_angle < TR:
+                elif new_angle < TR:
 		    turn = int(turn_guess - 1)
                     print '========== NEW ANGLE MORE THAN TR: turns: ', turn
 		    return [roombaList.index(r)]*(turn)
