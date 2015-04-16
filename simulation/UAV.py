@@ -37,20 +37,18 @@ class UAV:
         if self.targetNum != -1 and self.targetNum < len(self.roombaList):
             self.target = self.roombaList[self.targetNum].pos
         else:
-			xlist = [r.pos.x for r in self.roombaList if not(r.d)]
-			ylist = [r.pos.y for r in self.roombaList if not(r.d)]
-			avgX = sum(xlist)/len(xlist)
-			avgY = sum(ylist)/len(ylist)	
-            		self.NeutralTarget = Point(avgX, avgY)
-			self.target = self.NeutralTarget
+            xlist = [r.pos.x for r in self.roombaList if not(r.d)]
+            ylist = [r.pos.y for r in self.roombaList if not(r.d)]
+	    avgX = sum(xlist)/len(xlist)
+	    avgY = sum(ylist)/len(ylist)	
+            self.NeutralTarget = Point(avgX, avgY)
+	    self.target = self.NeutralTarget
         
         # plant (motion of quad)
         distanceToTarget = (self.pos.x-self.target.x)**2 + (self.pos.x-self.target.x)**2
         directiontoTarget = Vector(self.target.x-self.pos.x, self.target.y-self.pos.y, 0)
         self.vel = directiontoTarget
         self.vel.scale(self.maxSpeed/(self.vel.magnitude()+.01))
-
-
 
         if distanceToTarget < 8:
         # unresolved: can you turn the roomba if the roomba is currently turning?
@@ -62,7 +60,7 @@ class UAV:
                 self.targetNum = self.targetList.pop(0)
             else:
                 #self.targetNum = -1
-                self.targetList+=findTargetOld(self.roombaList)
+                self.targetList+=findTarget(self.roombaList)
         
         # plant (motion of quad)
         timeInterval = self.boardTime.getTime()-self.lastTime
@@ -80,11 +78,13 @@ def angleCost(r):
     actualY = r.pos.y-25
     [TL, BL] = [atan2(actualX, actualY) + pi/2, atan2(600-actualY, actualX) + pi]
     [BR, TR] = [atan2(600-actualX, 600-actualY) + 3*pi/2, atan2(actualY, 600-actualX)]
-    angle = (atan2(-r.vel.y, r.vel.x) + 2*pi) % 2*pi
+    angle = (atan2(-r.vel.y, r.vel.x))
+    if angle < 0:
+        angle += 2*pi
 
-    print "TL, BL, BR, TR: ", TL, BL, BR, TR
+    # print "TL, BL, BR, TR: ", TL, BL, BR, TR
 
-    print "angle: ", angle
+    # print "angle: ", angle
     if TR <= angle < TL:
 	C = 10
 	return C / (actualY/sin(angle))
@@ -99,44 +99,46 @@ def angleCost(r):
 	return C / ((600-actualX)/cos(angle))
     return -1
 	
-	
 def sort(roombaList):
     return sorted(roombaList, key = lambda roomba : angleCost(roomba))
 
 def findTarget(roombaList):
     #y = [r.pos.y for r in roombaList]
     #roombaList = [roombaList for (y,roombaList) in sorted(zip(y,roombaList))]
-    sortedRoombaList = sort(roombaList)
-    print [angleCost(r) for r in sortedRoombaList]
+    sortedRoombaList = sorted(roombaList, reverse=True)
+    # print 'angleCosts\n', [angleCost(r) for r in sortedRoombaList]
     # there is now a major bug where UAV struggles to evaluate a currently turning roomba
     for r in sortedRoombaList:
 	actualX = r.pos.x - 25
 	actualY = r.pos.y - 25
 	[TL, BL] = [atan2(actualX, actualY) + pi/2, atan2(600-actualY, actualX) + pi]
 	[BR, TR] = [atan2(600-actualX, 600-actualY) + 3*pi/2, atan2(actualY, 600-actualX)]
-    	angle = (atan2(-r.vel.y, r.vel.x) + 2*pi) % 2*pi
-	print 'angle: ', angle*(180/pi)
+    	angle = (atan2(-r.vel.y, r.vel.x))
+        if angle < 0:
+            angle += 2*pi
 
         if not TR <= angle <= TL:
-	    turn_guess = math.floor((((angle + 2*pi) - pi/2) % 2*pi)/(pi/4))
-	    new_angle = (((angle - turn_guess*pi/4) + 2*pi) % 2*pi) 
+            calc_angle = angle
+            if 0 <= angle < pi/2:
+                calc_angle += 2*pi  
+            turn_guess = math.floor((calc_angle - pi/2)/(pi/4))
+            new_angle = (calc_angle - turn_guess*pi/4)
+
+            # return [roombaList.index(r)]*(3)
 	    if TR <= new_angle <= TL:
-		print "ALREADY GOOD CASE" 
 		turn = int(turn_guess)
 		print 'turns: ', turn
 		return [roombaList.index(r)]*(turn)			
 	    else:
 		if new_angle > TL:
-		    print "UNDERSHOT"
 		    turn = int(turn_guess + 1)
-		    print 'turns: ', turn
+                    print '========== NEW ANGLE LESS THAN TL: turns: ', turn
 		    return [roombaList.index(r)]*(turn)
 		if new_angle < TR:
-		    print "OVERSHOT"
 		    turn = int(turn_guess - 1)
-		    print 'turns: ', turn
+                    print '========== NEW ANGLE MORE THAN TR: turns: ', turn
 		    return [roombaList.index(r)]*(turn)
-
+    print "SAD CASE"
     return [-1]
 
 def findTargetOld(roombaList):
