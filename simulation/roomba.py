@@ -26,14 +26,14 @@ class Roomba:
 	def death(self):
 		if self.pos.y <= 25 or self.pos.y >= 625 or self.pos.x <= 25 or self.pos.x >= 625:
 			self.d = 1
-			print "DEAD"
+			print "DEAD ROOMBA"
 
 
 	def step(self):
 	#	print 'Time'
 	#	print self.boardTime.getTime() - self.lastAngle
 	#	print self.boardTime.getTime() - self.lastTurn
-		print self.boardTime.getTime()
+		#print self.boardTime.getTime()
 
 		self.death()
 
