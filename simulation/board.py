@@ -96,7 +96,7 @@ class Board:
             r.circle.draw(self.win)
 
         # draw UAV
-        self.uav.circle.setFill(color_rgb(150,0,0))
+        self.uav.circle.setFill(color_rgb(150,23,189))
         self.uav.circle.draw(self.win)
 
         self.win.setBackground(color_rgb(150, 150, 150))   # grey background
@@ -176,5 +176,5 @@ class Board:
     def stop(self):
         self.win.getMouse()
     
-myboard = Board(20, 20, 3, 4)
+myboard = Board(20, 20, 10, 4)
 myboard.run()
