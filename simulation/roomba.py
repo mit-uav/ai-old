@@ -13,7 +13,7 @@ class Roomba:
 		self.turning = False
 		self.turningTime = 0.0
 		
-		self.size = 18
+		self.size = 20
 		self.circle = rCircle
 		self.velVect = rLine
 		self.d = 0
